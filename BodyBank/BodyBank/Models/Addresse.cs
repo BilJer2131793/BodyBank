@@ -8,7 +8,7 @@ namespace BodyBank.Models
     public class Addresse
     {
 
-        public int IDAdresse { get; set; }
+        public int AddresseId { get; set; }
         [Required]
         public int NoCivique { get; set; }
         [Required]
@@ -17,5 +17,6 @@ namespace BodyBank.Models
         public string Ville { get; set; }
         [Required]
         public string Province { get; set; }
+        public Addresse() { }
     }
 }

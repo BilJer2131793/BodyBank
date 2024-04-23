@@ -4,10 +4,10 @@ namespace BodyBank.Model
 {
     public class CommandeOrgane
     {
-        public int IDCommandeOrgane { get; set; }
+        public int CommandeOrganeId { get; set; }
 
         [Required]
-        public Organ Organ { get; set; }
+        public Organne Organ { get; set; }
 
         [Required]
         public Commande Commande { get; set; }

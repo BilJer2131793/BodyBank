@@ -8,7 +8,7 @@ namespace BodyBank.Model
     public class Util
     {
 
-        public int IDUtil { get; set; }
+        public int UtilId { get; set; }
         [Required]
         public string PrenomUtil { get; set; }
         [Required]

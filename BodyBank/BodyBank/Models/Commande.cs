@@ -5,7 +5,7 @@ namespace BodyBank.Model
 {
     public class Commande
     {
-        public int IDCommande { set;get; }
+        public int CommandeId { set;get; }
         public DateTime? Date { get; set; }
         public decimal? Total { get; set; }
         public Addresse? AdresseLivraison { get; set; }

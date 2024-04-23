@@ -2,7 +2,7 @@
 {
     public class Donneur
     {
-        public int IdDonneur { get; set; }
+        public int DonneurId { get; set; }
 
         public string? Nom { get; set; }
         public string? Prenom { get; set; }
@@ -10,8 +10,6 @@
         public int? Age { get; set; }
         public Double? Poids { get; set; }
         public Double? Taille { get; set; }
-
-
 
 
         public Donneur() 
