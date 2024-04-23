@@ -1,0 +1,47 @@
+﻿@model IEnumerable<BodyBank.Model.Util>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PrenomUtil)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NomUtil)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.PrenomUtil)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NomUtil)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.UtilId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.UtilId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.UtilId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

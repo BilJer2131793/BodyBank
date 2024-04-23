@@ -13,8 +13,11 @@ namespace BodyBank.Data
                 serviceProvider.GetRequiredService<
                     DbContextOptions<MVCBodyBankContext>>()))
             {
-
-                if (context.Type.Any())
+                //if (context.Type is not null)
+                //{
+                //    return;
+                //}
+                if (context?.Type?.Count() > 0)
                 {
                     return;
                 }
