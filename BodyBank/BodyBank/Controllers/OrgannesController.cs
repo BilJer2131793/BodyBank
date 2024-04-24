@@ -21,26 +21,24 @@ namespace BodyBank.Controllers
             _context = context;
         }
 
-        // GET: Organnes
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Organne>>> Get()
-        {
-            if(_context == null)
-                return BadRequest(ModelState);
-
-              return _context.Organne.ToArray(); ;
-        }
-
         // GET: Organnes/5
-        [HttpGet("{id}")]
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<Organne>>> Get(int? id)
         {
-            if (id == null || _context.Organne == null)
+            if (_context.Organne == null)
             {
-                return BadRequest("Id or context is null");
+                return BadRequest("Context is null");
             }
-
+            if (id == null)
+            {
+                return _context.Organne
+                    .Include(o => o.Type)
+                    .Include(o => o.Donneur)
+                    .ToArray(); ;
+            }
             var organne = await _context.Organne
+                .Include(o => o.Type)
+                .Include(o => o.Donneur)
                 .FirstOrDefaultAsync(m => m.OrganneId == id);
             if (organne == null)
             {

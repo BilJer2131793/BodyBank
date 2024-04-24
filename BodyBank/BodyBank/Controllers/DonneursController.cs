@@ -19,36 +19,28 @@ namespace BodyBank.Controllers
             _context = context;
         }
 
-        // GET: Donneurs
-        public async Task<IActionResult> Index()
-        {
-              return _context.Donneur != null ? 
-                          View(await _context.Donneur.ToListAsync()) :
-                          Problem("Entity set 'MVCBodyBankContext.Donneur'  is null.");
-        }
-
         // GET: Donneurs/Details/5
-        public async Task<IActionResult> Details(int? id)
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Donneur>>> Get(int? id)
         {
-            if (id == null || _context.Donneur == null)
+            if (_context.Donneur == null)
             {
-                return NotFound();
+                return BadRequest("Context est null");
+            }
+            if(id == null)
+            {
+                return _context.Donneur.ToArray();
             }
 
             var donneur = await _context.Donneur
                 .FirstOrDefaultAsync(m => m.DonneurId == id);
+
             if (donneur == null)
             {
-                return NotFound();
+                return BadRequest("Aucun objet at cet Id");
             }
 
-            return View(donneur);
-        }
-
-        // GET: Donneurs/Create
-        public IActionResult Create()
-        {
-            return View();
+            return Ok(donneur);
         }
 
         // POST: Donneurs/Create
@@ -67,21 +59,6 @@ namespace BodyBank.Controllers
             return View(donneur);
         }
 
-        // GET: Donneurs/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.Donneur == null)
-            {
-                return NotFound();
-            }
-
-            var donneur = await _context.Donneur.FindAsync(id);
-            if (donneur == null)
-            {
-                return NotFound();
-            }
-            return View(donneur);
-        }
 
         // POST: Donneurs/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -118,23 +95,6 @@ namespace BodyBank.Controllers
             return View(donneur);
         }
 
-        // GET: Donneurs/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.Donneur == null)
-            {
-                return NotFound();
-            }
-
-            var donneur = await _context.Donneur
-                .FirstOrDefaultAsync(m => m.DonneurId == id);
-            if (donneur == null)
-            {
-                return NotFound();
-            }
-
-            return View(donneur);
-        }
 
         // POST: Donneurs/Delete/5
         [HttpPost, ActionName("Delete")]
