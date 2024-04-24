@@ -7,10 +7,14 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BodyBank.Data;
 using BodyBank.Model;
+using Microsoft.AspNetCore.Components.Server.Circuits;
+
 
 namespace BodyBank.Controllers
 {
-    public class TypesController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class TypesController : ControllerBase
     {
         private readonly MVCBodyBankContext _context;
 
@@ -19,141 +23,157 @@ namespace BodyBank.Controllers
             _context = context;
         }
 
-        // GET: Types
-        public async Task<IActionResult> Index()
+
+        [HttpGet]
+        public ActionResult<IEnumerable<Model.Type>> Get()
         {
-              return _context.Type != null ? 
-                          View(await _context.Type.ToListAsync()) :
-                          Problem("Entity set 'MVCBodyBankContext.Type'  is null.");
+              return _context.Type.ToArray();
+        }
+        [HttpGet("{id}")]
+        public ActionResult<IEnumerable<Model.Type>> Get(int id)
+        {
+            return _context.Type.Where(x=>x.TypeId == id).ToArray();
         }
 
-        // GET: Types/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || _context.Type == null)
-            {
-                return NotFound();
-            }
 
-            var @type = await _context.Type
-                .FirstOrDefaultAsync(m => m.TypeId == id);
-            if (@type == null)
-            {
-                return NotFound();
-            }
-
-            return View(@type);
-        }
-
-        // GET: Types/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Types/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TypeId,Nom,PrixBase,Desc,Image")] Model.Type @type)
+        public async Task<ActionResult<Model.Type>> PostType(Model.Type type)
         {
-            if (ModelState.IsValid)
+            if(type == null)
             {
-                _context.Add(@type);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return BadRequest("Type is mepty");
             }
-            return View(@type);
-        }
-
-        // GET: Types/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.Type == null)
-            {
-                return NotFound();
-            }
-
-            var @type = await _context.Type.FindAsync(id);
-            if (@type == null)
-            {
-                return NotFound();
-            }
-            return View(@type);
-        }
-
-        // POST: Types/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TypeId,Nom,PrixBase,Desc,Image")] Model.Type @type)
-        {
-            if (id != @type.TypeId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(@type);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TypeExists(@type.TypeId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(@type);
-        }
-
-        // GET: Types/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.Type == null)
-            {
-                return NotFound();
-            }
-
-            var @type = await _context.Type
-                .FirstOrDefaultAsync(m => m.TypeId == id);
-            if (@type == null)
-            {
-                return NotFound();
-            }
-
-            return View(@type);
-        }
-
-        // POST: Types/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
             if (_context.Type == null)
             {
-                return Problem("Entity set 'MVCBodyBankContext.Type'  is null.");
+                return BadRequest("Context is null.");
             }
-            var @type = await _context.Type.FindAsync(id);
-            if (@type != null)
-            {
-                _context.Type.Remove(@type);
-            }
-            
+            _context.Type.Add(type);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return Ok();
         }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteType(int id)
+        {
+            var type = _context.Type.Find(id);
+            if (type == null)
+            {
+                return BadRequest("Type not found.");
+            }
+            else
+            {
+                _context.Type.Remove(type);
+                await _context.SaveChangesAsync();
+
+                return Ok();
+            }
+        }
+
+        //// POST: Types/Create
+        //// To protect from overposting attacks, enable the specific properties you want to bind to.
+        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Create([Bind("TypeId,Nom,PrixBase,Desc,Image")] Model.Type @type)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        _context.Add(@type);
+        //        await _context.SaveChangesAsync();
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    return View(@type);
+        //}
+
+
+
+        //// GET: Types/Edit/5
+        //public async Task<IActionResult> Edit(int? id)
+        //{
+        //    if (id == null || _context.Type == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var @type = await _context.Type.FindAsync(id);
+        //    if (@type == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(@type);
+        //}
+
+        //// POST: Types/Edit/5
+        //// To protect from overposting attacks, enable the specific properties you want to bind to.
+        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Edit(int id, [Bind("TypeId,Nom,PrixBase,Desc,Image")] Model.Type @type)
+        //{
+        //    if (id != @type.TypeId)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        try
+        //        {
+        //            _context.Update(@type);
+        //            await _context.SaveChangesAsync();
+        //        }
+        //        catch (DbUpdateConcurrencyException)
+        //        {
+        //            if (!TypeExists(@type.TypeId))
+        //            {
+        //                return NotFound();
+        //            }
+        //            else
+        //            {
+        //                throw;
+        //            }
+        //        }
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    return View(@type);
+        //}
+
+        //// GET: Types/Delete/5
+        //public async Task<IActionResult> Delete(int? id)
+        //{
+        //    if (id == null || _context.Type == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var @type = await _context.Type
+        //        .FirstOrDefaultAsync(m => m.TypeId == id);
+        //    if (@type == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return View(@type);
+        //}
+
+        //// POST: Types/Delete/5
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> DeleteConfirmed(int id)
+        //{
+        //    if (_context.Type == null)
+        //    {
+        //        return Problem("Entity set 'MVCBodyBankContext.Type'  is null.");
+        //    }
+        //    var @type = await _context.Type.FindAsync(id);
+        //    if (@type != null)
+        //    {
+        //        _context.Type.Remove(@type);
+        //    }
+
+        //    await _context.SaveChangesAsync();
+        //    return RedirectToAction(nameof(Index));
+        //}
 
         private bool TypeExists(int id)
         {
