@@ -19,140 +19,59 @@ namespace BodyBank.Controllers
             _context = context;
         }
 
-        // GET: Utils
-        public async Task<IActionResult> Index()
-        {
-              return _context.Util != null ? 
-                          View(await _context.Util.ToListAsync()) :
-                          Problem("Entity set 'MVCBodyBankContext.Util'  is null.");
-        }
+        // Quand u utilisateur est creer, creer une commande par defaut ---------------------
 
-        // GET: Utils/Details/5
-        public async Task<IActionResult> Details(int? id)
+        [HttpGet("Id")]
+        public async Task<ActionResult<IEnumerable<Util>>> Get(int? Id)
         {
-            if (id == null || _context.Util == null)
+            if(_context == null)
             {
-                return NotFound();
+                return BadRequest("Le context est null");
             }
 
-            var util = await _context.Util
-                .FirstOrDefaultAsync(m => m.UtilId == id);
-            if (util == null)
+            if(Id == null)
             {
-                return NotFound();
+                return _context.Util.ToArray();
             }
 
-            return View(util);
+            var util = _context.Util.Where(x=>x.UtilId == Id).FirstOrDefault();
+
+            return Ok(util);
         }
 
-        // GET: Utils/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Utils/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UtilId,PrenomUtil,NomUtil,Email")] Util util)
+        public async Task<ActionResult> Post([Bind("PrenomUtil,NomUtil,Email")] Util util)
         {
-            if (ModelState.IsValid)
+            if (_context == null)
             {
-                _context.Add(util);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return BadRequest("Le context est null");
             }
-            return View(util);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("L'utilisateur est mal construi");
+            }
+
+            _context.Util.Add(util);
+            _context.SaveChanges();
+
+            return Ok();
         }
 
-        // GET: Utils/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        [HttpPut]
+        public async Task<ActionResult> Put([Bind("UtilId,PrenomUtil,NomUtil,Email,AdresseUtil")]Util util)
         {
-            if (id == null || _context.Util == null)
+            if (_context == null)
             {
-                return NotFound();
+                return BadRequest("Le context est null");
             }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("L'utilisateur est mal construi");
+            }
+            _context.Util.Update(util);
+            _context.SaveChanges();
 
-            var util = await _context.Util.FindAsync(id);
-            if (util == null)
-            {
-                return NotFound();
-            }
-            return View(util);
-        }
-
-        // POST: Utils/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UtilId,PrenomUtil,NomUtil,Email")] Util util)
-        {
-            if (id != util.UtilId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(util);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UtilExists(util.UtilId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(util);
-        }
-
-        // GET: Utils/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.Util == null)
-            {
-                return NotFound();
-            }
-
-            var util = await _context.Util
-                .FirstOrDefaultAsync(m => m.UtilId == id);
-            if (util == null)
-            {
-                return NotFound();
-            }
-
-            return View(util);
-        }
-
-        // POST: Utils/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (_context.Util == null)
-            {
-                return Problem("Entity set 'MVCBodyBankContext.Util'  is null.");
-            }
-            var util = await _context.Util.FindAsync(id);
-            if (util != null)
-            {
-                _context.Util.Remove(util);
-            }
-            
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return Ok();
         }
 
         private bool UtilExists(int id)

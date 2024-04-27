@@ -48,15 +48,18 @@ namespace BodyBank.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DonneurId,Nom,Prenom,Sexe,Age,Poids,Taille")] Donneur donneur)
+        public async Task<IActionResult> Post([Bind("DonneurId,Nom,Prenom,Sexe,Age,Poids,Taille")] Donneur donneur)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(donneur);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return Ok("Donneur creer");
             }
-            return View(donneur);
+            else
+            {
+                return BadRequest("Donneur mal formuler");
+            }
         }
 
 

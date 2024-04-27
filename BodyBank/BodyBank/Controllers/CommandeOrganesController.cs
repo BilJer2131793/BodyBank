@@ -10,6 +10,8 @@ using BodyBank.Model;
 
 namespace BodyBank.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class CommandeOrganesController : Controller
     {
         private readonly MVCBodyBankContext _context;
@@ -19,141 +21,81 @@ namespace BodyBank.Controllers
             _context = context;
         }
 
-        // GET: CommandeOrganes
-        public async Task<IActionResult> Index()
+
+        [HttpGet("commandeId")]
+        public async Task<ActionResult<IEnumerable<Organne>>> Get(int commandeId)
         {
-              return _context.CommandeOrgane != null ? 
-                          View(await _context.CommandeOrgane.ToListAsync()) :
-                          Problem("Entity set 'MVCBodyBankContext.CommandeOrgane'  is null.");
+            if(commandeId == null)
+            {
+                return BadRequest("commandeId est null");
+            }
+
+            var commande = _context.Commande.Where(x=>x.CommandeId == commandeId).FirstOrDefault();
+
+            if(commande == null)
+            {
+                return BadRequest("La commande existe pas");
+            }
+
+            var organnes = _context.CommandeOrgane
+                .Where(x => x.Commande.CommandeId == commandeId)
+                .Include(x => x.Organne)
+                .Select(x => x.Organne).ToArray();
+            return organnes;
         }
 
-        // GET: CommandeOrganes/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || _context.CommandeOrgane == null)
-            {
-                return NotFound();
-            }
-
-            var commandeOrgane = await _context.CommandeOrgane
-                .FirstOrDefaultAsync(m => m.CommandeOrganeId == id);
-            if (commandeOrgane == null)
-            {
-                return NotFound();
-            }
-
-            return View(commandeOrgane);
-        }
-
-        // GET: CommandeOrganes/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: CommandeOrganes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CommandeOrganeId")] CommandeOrgane commandeOrgane)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(commandeOrgane);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(commandeOrgane);
-        }
-
-        // GET: CommandeOrganes/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.CommandeOrgane == null)
-            {
-                return NotFound();
-            }
-
-            var commandeOrgane = await _context.CommandeOrgane.FindAsync(id);
-            if (commandeOrgane == null)
-            {
-                return NotFound();
-            }
-            return View(commandeOrgane);
-        }
-
-        // POST: CommandeOrganes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CommandeOrganeId")] CommandeOrgane commandeOrgane)
-        {
-            if (id != commandeOrgane.CommandeOrganeId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(commandeOrgane);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CommandeOrganeExists(commandeOrgane.CommandeOrganeId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(commandeOrgane);
-        }
-
-        // GET: CommandeOrganes/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.CommandeOrgane == null)
-            {
-                return NotFound();
-            }
-
-            var commandeOrgane = await _context.CommandeOrgane
-                .FirstOrDefaultAsync(m => m.CommandeOrganeId == id);
-            if (commandeOrgane == null)
-            {
-                return NotFound();
-            }
-
-            return View(commandeOrgane);
-        }
-
-        // POST: CommandeOrganes/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [HttpPost("organneId, utilId")]
+        public async Task<IActionResult> Post(int organneId, int utilId)
         {
             if (_context.CommandeOrgane == null)
             {
-                return Problem("Entity set 'MVCBodyBankContext.CommandeOrgane'  is null.");
+                return BadRequest("Le contexte est null");
             }
-            var commandeOrgane = await _context.CommandeOrgane.FindAsync(id);
-            if (commandeOrgane != null)
+            else if(organneId == null || utilId == null)
             {
-                _context.CommandeOrgane.Remove(commandeOrgane);
+                return BadRequest("Les informations envoyer sont invalide");
             }
-            
+
+            var organne = _context.Organne.Where(x => x.OrganneId == organneId).FirstOrDefault();
+            var commande = _context.Commande.Where(x => x.Util.UtilId == utilId).LastOrDefault();
+
+            if (organne == null)
+                return BadRequest("Cette organne n'esxiste pas");
+            else if (commande == null)
+                return BadRequest("Cette commande n'existe pas");
+
+            _context.CommandeOrgane.Add(new CommandeOrgane { Organne = organne, Commande = commande });
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return Ok();
         }
+
+        [HttpDelete("organneId, utilId")]
+        public async Task<IActionResult> Delete(int organneId, int utilId)
+        {
+            if (_context.CommandeOrgane == null)
+            {
+                return BadRequest("Le contexte est null");
+            }
+            else if (organneId == null || utilId == null)
+            {
+                return BadRequest("Les informations envoyer sont invalide");
+            }
+
+            var organne = _context.Organne.Where(x => x.OrganneId == organneId).FirstOrDefault();
+            var commande = _context.Commande.Where(x => x.Util.UtilId == utilId).LastOrDefault();
+
+            if (organne == null)
+                return BadRequest("Cette organne n'esxiste pas");
+            else if (commande == null)
+                return BadRequest("Cette commande n'existe pas");
+
+            _context.CommandeOrgane.Remove(new CommandeOrgane { Organne = organne, Commande = commande });
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
 
         private bool CommandeOrganeExists(int id)
         {

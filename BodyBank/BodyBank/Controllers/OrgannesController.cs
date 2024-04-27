@@ -49,9 +49,7 @@ namespace BodyBank.Controllers
 
         }
 
-        // POST: Organnes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Post([Bind("Disponible,Prix,Type,Donneur")] Organne organne)
@@ -73,63 +71,9 @@ namespace BodyBank.Controllers
 
         }
 
-        //// POST: Organnes/Edit/5
-        //// To protect from overposting attacks, enable the specific properties you want to bind to.
-        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPut]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("OrganneId,Disponible,Prix")] Organne organne)
-        //{
-        //    if (id != organne.OrganneId)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _context.Update(organne);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!OrganneExists(organne.OrganneId))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    return BadRequest("bruh");
-        //}
-
-        //// POST: Organnes/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(int id)
-        //{
-        //    if (_context.Organne == null)
-        //    {
-        //        return Problem("Entity set 'MVCBodyBankContext.Organne'  is null.");
-        //    }
-        //    var organne = await _context.Organne.FindAsync(id);
-        //    if (organne != null)
-        //    {
-        //        _context.Organne.Remove(organne);
-        //    }
-            
-        //    await _context.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
-
-        //private bool OrganneExists(int id)
-        //{
-        //  return (_context.Organne?.Any(e => e.OrganneId == id)).GetValueOrDefault();
-        //}
+        private bool OrganneExists(int id)
+        {
+            return (_context.Organne?.Any(e => e.OrganneId == id)).GetValueOrDefault();
+        }
     }
 }

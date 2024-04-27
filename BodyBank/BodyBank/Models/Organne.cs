@@ -8,6 +8,9 @@
         public double Prix { get; set; }
         public Type Type { get; set; }
         public Donneur Donneur { get; set; }
-        public Organne() { }
+        public Organne() 
+        {
+            Disponible = true;
+        }
     }
 }

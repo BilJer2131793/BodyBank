@@ -7,9 +7,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BodyBank.Data;
 using BodyBank.Model;
+using BodyBank.Models;
 
 namespace BodyBank.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class CommandesController : Controller
     {
         private readonly MVCBodyBankContext _context;
@@ -19,141 +22,104 @@ namespace BodyBank.Controllers
             _context = context;
         }
 
-        // GET: Commandes
-        public async Task<IActionResult> Index()
-        {
-              return _context.Commande != null ? 
-                          View(await _context.Commande.ToListAsync()) :
-                          Problem("Entity set 'MVCBodyBankContext.Commande'  is null.");
-        }
-
-        // GET: Commandes/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || _context.Commande == null)
-            {
-                return NotFound();
-            }
-
-            var commande = await _context.Commande
-                .FirstOrDefaultAsync(m => m.CommandeId == id);
-            if (commande == null)
-            {
-                return NotFound();
-            }
-
-            return View(commande);
-        }
-
-        // GET: Commandes/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Commandes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CommandeId,Date,Total")] Commande commande)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(commande);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(commande);
-        }
-
-        // GET: Commandes/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.Commande == null)
-            {
-                return NotFound();
-            }
-
-            var commande = await _context.Commande.FindAsync(id);
-            if (commande == null)
-            {
-                return NotFound();
-            }
-            return View(commande);
-        }
-
-        // POST: Commandes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CommandeId,Date,Total")] Commande commande)
-        {
-            if (id != commande.CommandeId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(commande);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CommandeExists(commande.CommandeId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(commande);
-        }
-
-        // GET: Commandes/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.Commande == null)
-            {
-                return NotFound();
-            }
-
-            var commande = await _context.Commande
-                .FirstOrDefaultAsync(m => m.CommandeId == id);
-            if (commande == null)
-            {
-                return NotFound();
-            }
-
-            return View(commande);
-        }
-
-        // POST: Commandes/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [HttpGet("utilId,commandeId")]
+        public async Task<ActionResult<IEnumerable<Commande>>> Get(int? utilId, int? commandeId)
         {
             if (_context.Commande == null)
             {
-                return Problem("Entity set 'MVCBodyBankContext.Commande'  is null.");
+                return BadRequest("Context est null");
             }
-            var commande = await _context.Commande.FindAsync(id);
-            if (commande != null)
+            //renvoie toutes le commandes du system
+            if(utilId == null)
             {
-                _context.Commande.Remove(commande);
+                return _context.Commande.ToArray();
             }
-            
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            //renvoie les commandes d'un utilisateur
+            else if(commandeId == null)
+            {
+                var commandes = _context.Commande.Where(x => x.Util.UtilId == utilId).ToArray();
+                if (commandes == null)
+                    return BadRequest("Cette utilisateur a auncune commande");
+                else 
+                    return commandes;
+            }
+
+            var commande = _context.Commande.Where(x=>x.Util.UtilId == utilId && x.CommandeId == commandeId).ToArray();
+
+            if (commande == null)
+                return BadRequest("Cette commande n'existe pas");
+            else
+                return commande;
         }
+
+        // GET: Commandes/Create
+        [HttpPost("utilId")]
+        public async Task<IActionResult> Post(int utilId)
+        {
+            if(utilId == null)
+            {
+                return BadRequest("Id est null");
+            }
+
+            var util = _context.Util.Where(x => x.UtilId == utilId).FirstOrDefault();
+            if (util != null)
+            {
+                _context.Commande.Add(new Commande(util));
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            else
+            {
+                return BadRequest("Utilisateur invalide");
+            }
+
+        }
+
+
+        [HttpPut("utilId,addresseId")]
+        public async Task<IActionResult> FinalizerCommande(int utilId, int addresseId)
+        {
+            if (utilId == null)
+            {
+                return BadRequest("UtilisateurId est null");
+            }
+            else if(addresseId == null)
+            {
+                return BadRequest("addressId est null");
+            }
+
+            Util util = _context.Util.Where(x => x.UtilId == utilId).FirstOrDefault()!;
+            Addresse addresse = _context.Adresse.Where(x =>x.AddresseId == addresseId).FirstOrDefault()!;
+
+            if(util == null)
+            {
+                return BadRequest("Utilisateur invalide");
+            }
+            else if (addresse == null)
+            {
+                return BadRequest("Addresse invalide");
+            }
+
+            Commande commande = _context.Commande.LastOrDefault()!;
+            Organne[] organnesCommande = _context.CommandeOrgane.Where(x => x.Commande.CommandeId == commande.CommandeId).Select(x=>x.Organne).ToArray();
+            commande.Total = (decimal)organnesCommande.Sum(x => x.Prix);
+
+            commande.AdresseLivraison = addresse;
+            commande.Date = DateTime.Now.Date;
+
+            _context.Commande.Update(commande);
+
+            organnesCommande.ToList().ForEach(x => x.Disponible = false);
+            _context.Organne.UpdateRange(organnesCommande);
+            _context.Commande.Add(new Commande(util));
+
+            await _context.SaveChangesAsync();
+            return Ok();
+
+        }
+
+
+     
 
         private bool CommandeExists(int id)
         {

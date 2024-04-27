@@ -64,6 +64,7 @@ namespace BodyBank.Data
                 context.SaveChanges();
             }
             InitializeOrganes(serviceProvider);
+            InitializeUtil(serviceProvider);
         }
         public static void InitializeOrganes(IServiceProvider serviceProvider)
         {
@@ -146,6 +147,27 @@ namespace BodyBank.Data
                 context.SaveChanges();
             }
         }
+        public static void InitializeUtil(IServiceProvider serviceProvider)
+        {
+            using (var context = new MVCBodyBankContext(
+                serviceProvider.GetRequiredService<
+                DbContextOptions<MVCBodyBankContext>>()))
+            {
 
+                context.AddRange(
+                    new Util
+                    {
+                        PrenomUtil = "Tom",
+                        NomUtil = "Thomas",
+                        Email = "adresse@email.com"
+                    }
+                    );
+                context.SaveChanges();
+
+
+
+
+            }
+        }
     }
 }

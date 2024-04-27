@@ -7,7 +7,7 @@ namespace BodyBank.Model
         public int CommandeOrganeId { get; set; }
 
         [Required]
-        public Organne Organ { get; set; }
+        public Organne Organne { get; set; }
 
         [Required]
         public Commande Commande { get; set; }

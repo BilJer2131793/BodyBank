@@ -15,7 +15,7 @@ namespace BodyBank.Model
         public string NomUtil { get; set; }
         [Required]
         public string Email { get; set; }
-        public Addresse AdresseUtil { get; set; }
+        public Addresse? AdresseUtil { get; set; }
 
         public Util()
         {

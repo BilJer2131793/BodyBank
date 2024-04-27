@@ -4,6 +4,7 @@ using BodyBank.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BodyBank.Migrations
 {
     [DbContext(typeof(MVCBodyBankContext))]
-    partial class MVCBodyBankContextModelSnapshot : ModelSnapshot
+    [Migration("20240425005047_typo")]
+    partial class typo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -170,7 +172,7 @@ namespace BodyBank.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UtilId"), 1L, 1);
 
-                    b.Property<int?>("AdresseUtilAddresseId")
+                    b.Property<int>("AdresseUtilAddresseId")
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
@@ -282,7 +284,9 @@ namespace BodyBank.Migrations
                 {
                     b.HasOne("BodyBank.Models.Addresse", "AdresseUtil")
                         .WithMany()
-                        .HasForeignKey("AdresseUtilAddresseId");
+                        .HasForeignKey("AdresseUtilAddresseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("AdresseUtil");
                 });

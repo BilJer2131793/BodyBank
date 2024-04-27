@@ -14,6 +14,11 @@ namespace BodyBank.Model
 
         public Commande()
         {
+
+        }
+        public Commande(Util util)
+        {
+            Util = util;
         }
     }
 }
