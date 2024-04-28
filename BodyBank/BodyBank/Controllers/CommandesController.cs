@@ -39,7 +39,7 @@ namespace BodyBank.Controllers
             {
                 var commandes = _context.Commande.Where(x => x.Util.UtilId == utilId).ToArray();
                 if (commandes == null)
-                    return BadRequest("Cette utilisateur a auncune commande");
+                    return BadRequest("Cette utilisateur a aucune commande");
                 else 
                     return commandes;
             }

@@ -25,7 +25,7 @@ namespace BodyBank.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Organne>>> Get(int? id)
         {
-            if (_context.Organne == null)
+            if (_context == null)
             {
                 return BadRequest("Context is null");
             }

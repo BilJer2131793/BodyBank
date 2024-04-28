@@ -42,7 +42,7 @@ namespace BodyBank.Controllers
         public async Task<ActionResult<Model.Type>> PostType([Bind("Nom,PrixBase,Desc,Image")]Model.Type type)
         {
 
-            if (_context.Type == null)
+            if (_context == null)
             {
                 return BadRequest("Context est null");
             }

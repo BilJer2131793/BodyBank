@@ -15,7 +15,7 @@ namespace BodyBank.Data
         {
 
         }
-        public DbSet<Addresse> Adresse { get; set; }
+        public DbSet<Addresse> Addresse { get; set; }
         public DbSet<Commande> Commande { get; set; }
         public DbSet<CommandeOrgane> CommandeOrgane { get; set; }
         public DbSet<Donneur> Donneur { get; set; }

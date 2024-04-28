@@ -52,6 +52,7 @@ namespace BodyBank.Controllers
             }
 
             _context.Util.Add(util);
+            _context.Commande.Add(new Commande(util));
             _context.SaveChanges();
 
             return Ok();

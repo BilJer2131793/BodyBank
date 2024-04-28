@@ -10,7 +10,9 @@ using BodyBank.Models;
 
 namespace BodyBank.Controllers
 {
-    public class AddressesController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class AddressesController : ControllerBase
     {
         private readonly MVCBodyBankContext _context;
 
@@ -19,145 +21,63 @@ namespace BodyBank.Controllers
             _context = context;
         }
 
-        // GET: Addresses
-        public async Task<IActionResult> Index()
-        {
-              return _context.Adresse != null ? 
-                          View(await _context.Adresse.ToListAsync()) :
-                          Problem("Entity set 'MVCBodyBankContext.Adresse'  is null.");
-        }
 
-        // GET: Addresses/Details/5
-        public async Task<IActionResult> Details(int? id)
+        [HttpGet("{id}")]
+        public ActionResult<IEnumerable<Addresse>> Get(int? id)
         {
-            if (id == null || _context.Adresse == null)
+            if (_context == null)
             {
-                return NotFound();
+                return BadRequest("Le context est null");
             }
-
-            var addresse = await _context.Adresse
-                .FirstOrDefaultAsync(m => m.AddresseId == id);
-            if (addresse == null)
+            else if (id == null)
             {
-                return NotFound();
+                return _context.Addresse.ToArray();
             }
-
-            return View(addresse);
+            return _context.Addresse.Where(x => x.AddresseId == id).ToArray();
         }
 
-        // GET: Addresses/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Addresses/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AddresseId,NoCivique,Rue,Ville,Province")] Addresse addresse)
+        public async Task<ActionResult<Addresse>> Post([Bind("NoCivique,Rue,Ville,Province")] Addresse addresse)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(addresse);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(addresse);
-        }
 
-        // GET: Addresses/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.Adresse == null)
+            if (_context == null)
             {
-                return NotFound();
+                return BadRequest("Context est null");
             }
-
-            var addresse = await _context.Adresse.FindAsync(id);
-            if (addresse == null)
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                return BadRequest("L'addresse est mal construi");
             }
-            return View(addresse);
-        }
-
-        // POST: Addresses/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AddresseId,NoCivique,Rue,Ville,Province")] Addresse addresse)
-        {
-            if (id != addresse.AddresseId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(addresse);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!AddresseExists(addresse.AddresseId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(addresse);
-        }
-
-        // GET: Addresses/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.Adresse == null)
-            {
-                return NotFound();
-            }
-
-            var addresse = await _context.Adresse
-                .FirstOrDefaultAsync(m => m.AddresseId == id);
-            if (addresse == null)
-            {
-                return NotFound();
-            }
-
-            return View(addresse);
-        }
-
-        // POST: Addresses/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (_context.Adresse == null)
-            {
-                return Problem("Entity set 'MVCBodyBankContext.Adresse'  is null.");
-            }
-            var addresse = await _context.Adresse.FindAsync(id);
-            if (addresse != null)
-            {
-                _context.Adresse.Remove(addresse);
-            }
-            
+            _context.Addresse.Add(addresse);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return Ok();
         }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (_context == null)
+            {
+                return BadRequest("Le context est null");
+            }
+
+            var addresse = _context.Addresse.Find(id);
+            if (addresse == null)
+            {
+                return BadRequest("Type existe pas");
+            }
+
+            _context.Addresse.Remove(addresse);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+
+        }
+
 
         private bool AddresseExists(int id)
         {
-          return (_context.Adresse?.Any(e => e.AddresseId == id)).GetValueOrDefault();
+          return (_context.Addresse?.Any(e => e.AddresseId == id)).GetValueOrDefault();
         }
     }
 }
