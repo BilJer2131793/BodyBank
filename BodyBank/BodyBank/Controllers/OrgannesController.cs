@@ -71,6 +71,28 @@ namespace BodyBank.Controllers
 
         }
 
+        [HttpPut]
+        public async Task<IActionResult> Put([Bind("OrganneId,Disponible,Prix,Type,Donneur")] Organne organne)
+        {
+            if(_context == null)
+            {
+                return BadRequest("Le context est null");
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("L'organne est mal construit");
+            }
+
+            _context.Organne.Update(organne);
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+
+
+
         private bool OrganneExists(int id)
         {
             return (_context.Organne?.Any(e => e.OrganneId == id)).GetValueOrDefault();
