@@ -22,9 +22,13 @@ namespace BodyBank.Controllers
         }
 
 
-        [HttpGet("commandeId")]
-        public async Task<ActionResult<IEnumerable<Organne>>> Get(int commandeId)
+        [HttpGet("{commandeId}")]
+        public async Task<ActionResult<IEnumerable<Organne>>> Get(int? commandeId)
         {
+            if(_context == null)
+            {
+                return BadRequest("Le context est null");
+            }
             if(commandeId == null)
             {
                 return BadRequest("commandeId est null");

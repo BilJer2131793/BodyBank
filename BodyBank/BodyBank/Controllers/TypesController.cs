@@ -24,7 +24,7 @@ namespace BodyBank.Controllers
         }
 
 
-        [HttpGet("{id}")]
+        [HttpGet]
         public ActionResult<IEnumerable<Model.Type>> Get(int? id)
         {
             if(_context == null)

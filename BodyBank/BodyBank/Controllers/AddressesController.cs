@@ -22,7 +22,7 @@ namespace BodyBank.Controllers
         }
 
 
-        [HttpGet("{id}")]
+        [HttpGet]
         public ActionResult<IEnumerable<Addresse>> Get(int? id)
         {
             if (_context == null)

@@ -21,7 +21,6 @@ namespace BodyBank.Controllers
             _context = context;
         }
 
-        // GET: Organnes/5
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Organne>>> Get(int? id)
         {

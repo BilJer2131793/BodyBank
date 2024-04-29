@@ -13,6 +13,12 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseCors(builder => builder
+       .AllowAnyHeader()
+       .AllowAnyMethod()
+       .AllowAnyOrigin()
+    );
+
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
