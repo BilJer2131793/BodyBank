@@ -55,6 +55,29 @@ namespace BodyBank.Controllers
 
             return Ok();
         }
+        [HttpPut]
+        public async Task<ActionResult> Put([Bind("TypeId,Nom,PrixBase,Desc,Image")] Model.Type type)
+        {
+            if (_context == null)
+            {
+                return BadRequest("Context is null");
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Type est mal construit");
+            }
+            try
+            {
+                _context.Entry(type).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest("Ce type n'existe pas");
+            }
+        }
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteType(int id)
         {

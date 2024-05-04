@@ -14,9 +14,9 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 app.UseCors(builder => builder
+       .AllowAnyOrigin()
        .AllowAnyHeader()
        .AllowAnyMethod()
-       .AllowAnyOrigin()
     );
 
 using (var scope = app.Services.CreateScope())
