@@ -25,7 +25,7 @@ namespace BodyBank.Controllers
 
 
         [HttpGet]
-        public ActionResult<IEnumerable<Model.Type>> Get(int? id)
+        public async Task<ActionResult<IEnumerable<Model.Type>>> Get(int? id)
         {
             if(_context == null)
             {
@@ -33,9 +33,9 @@ namespace BodyBank.Controllers
             }
             else if(id == null)
             {
-                return _context.Type.ToArray();
+                return Ok(_context.Type.ToArray());
             }
-            return _context.Type.Where(x=>x.TypeId == id).ToArray();
+            return Ok(_context.Type.Where(x=>x.TypeId == id).ToArray());
         }
 
         [HttpPost]
