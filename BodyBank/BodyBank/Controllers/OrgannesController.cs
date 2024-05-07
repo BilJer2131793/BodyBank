@@ -45,9 +45,7 @@ namespace BodyBank.Controllers
             }
 
             return Ok(organne);
-
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -89,12 +87,26 @@ namespace BodyBank.Controllers
             return Ok();
         }
 
-
-
-
-        private bool OrganneExists(int id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            return (_context.Organne?.Any(e => e.OrganneId == id)).GetValueOrDefault();
+            if (_context == null)
+            {
+                return BadRequest("Le context est null");
+            }
+
+            var organne = _context.Organne.Find(id);
+
+            if (organne == null)
+            {
+                return BadRequest("Cette organne n'esxiste pas");
+            }
+            _context.Organne.Remove(organne);
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
         }
+
     }
 }

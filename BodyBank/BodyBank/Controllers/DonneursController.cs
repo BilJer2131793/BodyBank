@@ -10,6 +10,8 @@ using BodyBank.Model;
 
 namespace BodyBank.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class DonneursController : Controller
     {
         private readonly MVCBodyBankContext _context;
@@ -19,7 +21,6 @@ namespace BodyBank.Controllers
             _context = context;
         }
 
-        // GET: Donneurs/Details/5
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Donneur>>> Get(int? id)
         {
@@ -43,11 +44,7 @@ namespace BodyBank.Controllers
             return Ok(donneur);
         }
 
-        // POST: Donneurs/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Post([Bind("DonneurId,Nom,Prenom,Sexe,Age,Poids,Taille")] Donneur donneur)
         {
             if (ModelState.IsValid)
@@ -63,46 +60,8 @@ namespace BodyBank.Controllers
         }
 
 
-        // POST: Donneurs/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("DonneurId,Nom,Prenom,Sexe,Age,Poids,Taille")] Donneur donneur)
-        {
-            if (id != donneur.DonneurId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(donneur);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!DonneurExists(donneur.DonneurId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(donneur);
-        }
-
-
-        // POST: Donneurs/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int id)
         {
             if (_context.Donneur == null)
             {
@@ -115,7 +74,7 @@ namespace BodyBank.Controllers
             }
             
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return Ok();
         }
 
         private bool DonneurExists(int id)

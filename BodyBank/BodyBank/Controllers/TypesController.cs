@@ -96,14 +96,6 @@ namespace BodyBank.Controllers
             await _context.SaveChangesAsync();
 
             return Ok();
-
-        }
-
-
-
-        private bool TypeExists(int id)
-        {
-          return (_context.Type?.Any(e => e.TypeId == id)).GetValueOrDefault();
         }
     }
 }
