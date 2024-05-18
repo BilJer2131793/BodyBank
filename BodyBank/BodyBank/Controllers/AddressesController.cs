@@ -7,12 +7,15 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BodyBank.Data;
 using BodyBank.Models;
+using Microsoft.AspNetCore.Authorization;
+using BodyBank.Authentification;
+using System.Security.Claims;
 
 namespace BodyBank.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AddressesController : ControllerBase
+    public class AddressesController : CustomController
     {
         private readonly MVCBodyBankContext _context;
 
@@ -26,10 +29,9 @@ namespace BodyBank.Controllers
         public ActionResult<IEnumerable<Addresse>> Get(int? id)
         {
             if (_context == null)
-            {
-                return BadRequest("Le context est null");
-            }
-            else if (id == null)
+                return BadRequest("Context est null");
+
+            if (id == null)
             {
                 return _context.Addresse.ToArray();
             }
@@ -41,13 +43,12 @@ namespace BodyBank.Controllers
         {
 
             if (_context == null)
-            {
                 return BadRequest("Context est null");
-            }
+            if (!IsAdmin())
+                return BadRequest("Vous etes pas administrateur");
             if (!ModelState.IsValid)
-            {
                 return BadRequest("L'addresse est mal construi");
-            }
+
             _context.Addresse.Add(addresse);
             await _context.SaveChangesAsync();
 
@@ -57,9 +58,9 @@ namespace BodyBank.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             if (_context == null)
-            {
-                return BadRequest("Le context est null");
-            }
+                return BadRequest("Context est null");
+            if (!IsAdmin())
+                return BadRequest("Vous etes pas administrateur");
 
             var addresse = _context.Addresse.Find(id);
             if (addresse == null)
@@ -72,12 +73,6 @@ namespace BodyBank.Controllers
 
             return Ok();
 
-        }
-
-
-        private bool AddresseExists(int id)
-        {
-          return (_context.Addresse?.Any(e => e.AddresseId == id)).GetValueOrDefault();
         }
     }
 }

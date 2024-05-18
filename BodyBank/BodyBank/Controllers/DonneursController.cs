@@ -7,12 +7,15 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BodyBank.Data;
 using BodyBank.Model;
+using Microsoft.AspNetCore.Authorization;
+using BodyBank.Authentification;
+using System.Security.Claims;
 
 namespace BodyBank.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class DonneursController : Controller
+    public class DonneursController : CustomController
     {
         private readonly MVCBodyBankContext _context;
 
@@ -21,13 +24,13 @@ namespace BodyBank.Controllers
             _context = context;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Donneur>>> Get(int? id)
         {
             if (_context.Donneur == null)
-            {
                 return BadRequest("Context est null");
-            }
+
             if(id == null)
             {
                 return _context.Donneur.ToArray();
@@ -47,26 +50,27 @@ namespace BodyBank.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([Bind("DonneurId,Nom,Prenom,Sexe,Age,Poids,Taille")] Donneur donneur)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(donneur);
-                await _context.SaveChangesAsync();
-                return Ok("Donneur creer");
-            }
-            else
-            {
-                return BadRequest("Donneur mal formuler");
-            }
+            if (_context == null)
+                return BadRequest("Context est null");
+            if (!IsAdmin())
+                return BadRequest("Vous etes pas administrateur");
+            if (!ModelState.IsValid)
+                return BadRequest("Donneur mal construit");
+
+            _context.Add(donneur);
+            await _context.SaveChangesAsync();
+            return Ok("Donneur creer");
         }
 
 
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
-            if (_context.Donneur == null)
-            {
-                return Problem("Entity set 'MVCBodyBankContext.Donneur'  is null.");
-            }
+            if (_context == null)
+                return BadRequest("Context est null");
+            if (!IsAdmin())
+                return BadRequest("Vous etes pas administrateur");
+
             var donneur = await _context.Donneur.FindAsync(id);
             if (donneur != null)
             {
@@ -77,9 +81,5 @@ namespace BodyBank.Controllers
             return Ok();
         }
 
-        private bool DonneurExists(int id)
-        {
-          return (_context.Donneur?.Any(e => e.DonneurId == id)).GetValueOrDefault();
-        }
     }
 }

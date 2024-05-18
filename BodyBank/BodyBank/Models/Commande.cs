@@ -1,4 +1,5 @@
-﻿using BodyBank.Models;
+﻿using BodyBank.Authentification;
+using BodyBank.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace BodyBank.Model
@@ -8,17 +9,19 @@ namespace BodyBank.Model
         public int CommandeId { set;get; }
         public DateTime? Date { get; set; }
         public decimal? Total { get; set; }
+        public string Statut { get; set; }
         public Addresse? AdresseLivraison { get; set; }
         [Required]
-        public Util Util { get; set; }
+        public Utilisateur Util { get; set; }
 
         public Commande()
         {
 
         }
-        public Commande(Util util)
+        public Commande(Utilisateur util)
         {
             Util = util;
+            Statut = "en cours";
         }
     }
 }

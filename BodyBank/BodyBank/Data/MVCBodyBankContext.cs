@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using BodyBank.Models;
 using BodyBank.Model;
-
+using BodyBank.Authentification;
 
 namespace BodyBank.Data
 {
-    public class MVCBodyBankContext : DbContext
+    public class MVCBodyBankContext : IdentityDbContext<IdentityUser>
     {
         public MVCBodyBankContext(DbContextOptions<MVCBodyBankContext> options)
             : base(options)
@@ -23,7 +23,7 @@ namespace BodyBank.Data
         public DbSet<CommandeOrgane> CommandeOrgane { get; set; }
         public DbSet<Donneur> Donneur { get; set; }
         public DbSet<Organne> Organne { get; set; }
-        public DbSet<BodyBank.Model.Type> Type { get; set; }
-        public DbSet<Util> Util { get; set; }
+        public DbSet<Model.Type> Type { get; set; }
+        public DbSet<Authentification.Utilisateur> Util { get; set; }
     }
 }

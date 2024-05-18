@@ -155,11 +155,12 @@ namespace BodyBank.Data
             {
 
                 context.AddRange(
-                    new Util
+                    new Authentification.Utilisateur
                     {
                         PrenomUtil = "Tom",
                         NomUtil = "Thomas",
-                        Email = "adresse@email.com"
+                        Email = "adresse@email.com",
+                        Password = "Password",
                     }
                     );
                 context.SaveChanges();

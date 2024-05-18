@@ -4,6 +4,7 @@ using BodyBank.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BodyBank.Migrations
 {
     [DbContext(typeof(MVCBodyBankContext))]
-    partial class MVCBodyBankContextModelSnapshot : ModelSnapshot
+    [Migration("20240508190354_utilisateurCustom")]
+    partial class utilisateurCustom
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,16 +38,11 @@ namespace BodyBank.Migrations
                     b.Property<DateTime?>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Statut")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal?>("Total")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("UtilId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("UtilId")
+                        .HasColumnType("int");
 
                     b.HasKey("CommandeId");
 
@@ -167,6 +164,39 @@ namespace BodyBank.Migrations
                     b.ToTable("Type");
                 });
 
+            modelBuilder.Entity("BodyBank.Model.Util", b =>
+                {
+                    b.Property<int>("UtilId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UtilId"), 1L, 1);
+
+                    b.Property<int?>("AdresseUtilAddresseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("NomUtil")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PrenomUtil")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UtilId");
+
+                    b.HasIndex("AdresseUtilAddresseId");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Util");
+                });
+
             modelBuilder.Entity("BodyBank.Models.Addresse", b =>
                 {
                     b.Property<int>("AddresseId")
@@ -259,10 +289,6 @@ namespace BodyBank.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -314,8 +340,6 @@ namespace BodyBank.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -399,37 +423,13 @@ namespace BodyBank.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("BodyBank.Authentification.Utilisateur", b =>
-                {
-                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
-
-                    b.Property<int?>("AdresseUtilAddresseId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("NomUtil")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PrenomUtil")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasIndex("AdresseUtilAddresseId");
-
-                    b.HasDiscriminator().HasValue("Utilisateur");
-                });
-
             modelBuilder.Entity("BodyBank.Model.Commande", b =>
                 {
                     b.HasOne("BodyBank.Models.Addresse", "AdresseLivraison")
                         .WithMany()
                         .HasForeignKey("AdresseLivraisonAddresseId");
 
-                    b.HasOne("BodyBank.Authentification.Utilisateur", "Util")
+                    b.HasOne("BodyBank.Model.Util", "Util")
                         .WithMany()
                         .HasForeignKey("UtilId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -476,6 +476,15 @@ namespace BodyBank.Migrations
                     b.Navigation("Donneur");
 
                     b.Navigation("Type");
+                });
+
+            modelBuilder.Entity("BodyBank.Model.Util", b =>
+                {
+                    b.HasOne("BodyBank.Models.Addresse", "AdresseUtil")
+                        .WithMany()
+                        .HasForeignKey("AdresseUtilAddresseId");
+
+                    b.Navigation("AdresseUtil");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -527,15 +536,6 @@ namespace BodyBank.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("BodyBank.Authentification.Utilisateur", b =>
-                {
-                    b.HasOne("BodyBank.Models.Addresse", "AdresseUtil")
-                        .WithMany()
-                        .HasForeignKey("AdresseUtilAddresseId");
-
-                    b.Navigation("AdresseUtil");
                 });
 #pragma warning restore 612, 618
         }
